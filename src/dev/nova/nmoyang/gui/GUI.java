@@ -15,7 +15,7 @@ public class GUI extends JFrame {
 
         this.mainLabel = new JLabel("");
         mainLabel.setVisible(false);
-        
+
         this.mainPanel = new JPanel();
 
 
