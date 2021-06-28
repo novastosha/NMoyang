@@ -1,7 +1,12 @@
 package dev.nova.nmoyang;
 
 import dev.nova.nmoyang.api.API;
+import dev.nova.nmoyang.console.Command;
+import dev.nova.nmoyang.console.commands.APICommand;
 import dev.nova.nmoyang.gui.GUI;
+
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
 
@@ -9,18 +14,63 @@ public class Main {
 
     public static void main(String[] args) {
         API = new API();
+
+        registerCommands(new APICommand());
+
         if(args.length == 0){
-            guiMode();
-        }else if (args.length == 1 && args[0].equalsIgnoreCase("consoleMode")){
-            consoleMode();
+            //guiMode();
+            commandMode("You have entered command mode!");
+        }else if (args.length == 1 && args[0].equalsIgnoreCase("commandMode")){
+            commandMode("You have entered command mode!");
         }else{
-            consoleMode();
+            commandMode("You have entered command mode!");
         }
     }
 
-    private static void consoleMode() {
+    private static void commandMode(String s) {
 
+        Scanner scanner = new Scanner(System.in);
+
+        if(s != null) {
+            System.out.println(s);
+        }
+
+        String command = scanner.nextLine();
+
+        if(command.isEmpty()){
+            commandMode("Command cannot be empty! Try again!");
+            return;
+        }
+
+        String[] argsRaw = command.split(" ");
+        String cmd = argsRaw[0];
+        String[] args = new String[0];
+        if(argsRaw.length != 1) {
+            args = new String[argsRaw.length - 1];
+            int index = 0;
+            for (String c : argsRaw) {
+                if (index != 0) {
+                    args[index - 1] = c;
+                }
+                index++;
+            }
+        }
+
+
+
+        Command cmdCls = Command.getCommand(cmd);
+
+        if(cmdCls == null) {
+            commandMode("Could not find this command!");
+            return;
+        }
+
+        cmdCls.execute(args);
+
+        commandMode(null);
     }
+
+
 
     private static void guiMode() {
         GUI gui = new GUI();
@@ -28,5 +78,11 @@ public class Main {
 
     public static API getAPI() {
         return API;
+    }
+
+    public static void registerCommands(Command cmd, Command... commands) {
+        Command.COMMANDS.add(cmd);
+
+        Command.COMMANDS.addAll(Arrays.asList(commands));
     }
 }
