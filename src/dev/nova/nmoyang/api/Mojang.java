@@ -75,8 +75,12 @@ public class Mojang {
             }
 
             BufferedReader reader = new BufferedReader(streamReader);
+            String line = reader.readLine();
 
-            return getProperUUID(StringUtils.substringBetween(reader.readLine(),"{","}").split(",")[1].split(":")[1].replaceAll("\"",""));
+            reader.close();
+            connection.disconnect();
+
+            return getProperUUID(StringUtils.substringBetween(line,"{","}").split(",")[1].split(":")[1].replaceAll("\"",""));
         } catch (IOException e) {
             return null;
         }
