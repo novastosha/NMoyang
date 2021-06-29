@@ -2,7 +2,7 @@ package dev.nova.nmoyang.api;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import org.apache.commons.lang3.StringUtils;
+import dev.nova.nmoyang.utils.StringUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
