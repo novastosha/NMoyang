@@ -14,9 +14,9 @@ public class StatusCommand extends Command {
         if(args.length == 0) {
             System.out.println("Please specify a type");
             for(MojangServerType serverType : MojangServerType.values()){
-                System.out.println("   - "+serverType.name());
+                System.out.println("  - "+serverType.name());
             }
-            System.out.println("   - ALL");
+            System.out.println("  - ALL");
             return;
         }
 
