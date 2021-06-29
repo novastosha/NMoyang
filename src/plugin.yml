@@ -1,0 +1,4 @@
+main: dev.nova.nmoyang.bukkit.MainBukkit
+version: 1.0
+name: NMoyangAPI
+description: A java wrapper for MojangAPI.
