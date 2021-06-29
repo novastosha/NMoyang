@@ -1,6 +1,8 @@
 package dev.nova.nmoyang.gui;
 
 import dev.nova.nmoyang.Main;
+import dev.nova.nmoyang.api.MojangServerType;
+import dev.nova.nmoyang.api.MojangStates;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,10 +37,7 @@ public class GUI extends JFrame {
         //Add the label.
         mainPanel.add(mainLabel);
 
-        if(!Main.getAPI().isUp()){
-            mainLabel.setText("The Mojang API is down right now... Try Again later!");
-            mainLabel.setVisible(true);
-        }
+
     }
 
     public JLabel getMainLabel() {
