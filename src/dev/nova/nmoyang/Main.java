@@ -1,8 +1,9 @@
 package dev.nova.nmoyang;
 
-import dev.nova.nmoyang.api.API;
+import dev.nova.nmoyang.api.Mojang;
 import dev.nova.nmoyang.console.Command;
-import dev.nova.nmoyang.console.commands.APICommand;
+import dev.nova.nmoyang.console.commands.PlayerCommands;
+import dev.nova.nmoyang.console.commands.StatusCommand;
 import dev.nova.nmoyang.gui.GUI;
 
 import java.util.Arrays;
@@ -10,12 +11,12 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static API API;
+    private static Mojang API;
 
     public static void main(String[] args) {
-        API = new API();
+        API = new Mojang();
 
-        registerCommands(new APICommand());
+        registerCommands(new StatusCommand(),new PlayerCommands());
 
         if(args.length == 0){
             //guiMode();
@@ -34,7 +35,6 @@ public class Main {
         if(s != null) {
             System.out.println(s);
         }
-
         String command = scanner.nextLine();
 
         if(command.isEmpty()){
@@ -76,7 +76,7 @@ public class Main {
         GUI gui = new GUI();
     }
 
-    public static API getAPI() {
+    public static Mojang getAPI() {
         return API;
     }
 
