@@ -168,8 +168,6 @@ public class Mojang {
                 streamReader = new InputStreamReader(connection.getInputStream());
             }
 
-
-
                 JsonParser jsonParser = new JsonParser();
                 JsonArray jsonArray = (JsonArray) jsonParser.parse(streamReader);
 
