@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NMoyang:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/NMoyang_jar</output-path>
+    <root id="archive" name="NMoyang.jar">
+      <element id="module-output" name="NMoyang" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/gson-2.8.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
