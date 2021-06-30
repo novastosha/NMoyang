@@ -4,8 +4,11 @@ import dev.nova.nmoyang.api.Mojang;
 import dev.nova.nmoyang.console.Command;
 import dev.nova.nmoyang.console.commands.PlayerCommands;
 import dev.nova.nmoyang.console.commands.StatusCommand;
+import dev.nova.nmoyang.console.commands.UpdateNameCommand;
 import dev.nova.nmoyang.gui.GUI;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -13,7 +16,7 @@ public class Main {
 
     private static Mojang API;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws LoginException, IOException {
         API = new Mojang();
 
         registerCommands(new StatusCommand(),new PlayerCommands());
@@ -25,6 +28,10 @@ public class Main {
             commandMode("You have entered command mode!");
         }else{
             commandMode("You have entered command mode!");
+            if(API.isAuthMode()){
+                System.out.println("The mojang api instance is in authentication mode! Enabling auth-required commands.");
+                registerCommands(new UpdateNameCommand());
+            }
         }
     }
 
