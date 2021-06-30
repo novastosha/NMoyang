@@ -1,18 +1,85 @@
 package dev.nova.nmoyang.api;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import dev.nova.nmoyang.api.player.Name;
 import dev.nova.nmoyang.utils.StringUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
+import javax.net.ssl.HttpsURLConnection;
+import javax.security.auth.login.LoginException;
 
 
 public class Mojang {
 
+    private final String accesstoken;
+    private final boolean authMode;
+
+    /**
+     *
+     * Mojang API for accounts.
+     *
+     * @param email Email of the account.
+     * @param password Password of the account.
+     * @throws LoginException Gets thrown when it is unable to login.
+     */
+    public Mojang(String email, String password) throws LoginException, IOException {
+        String payload = String.format("{\"agent\": {\"name\": \"Minecraft\",\"version\": 1},\"username\": \"" + email + "\",\"password\": \"" + password + "\",\"clientToken\": \"" + UUID.randomUUID() + "\"}");
+
+        URL authenticationURL = new URL("https://authserver.mojang.com/authenticate");
+
+        HttpsURLConnection connection = (HttpsURLConnection)authenticationURL.openConnection();
+        byte payloadAsBytes[] = payload.getBytes(Charset.forName("UTF-8"));
+
+        connection.setConnectTimeout(15000);
+        connection.setReadTimeout(15000);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("charset", "UTF-8");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Content-Length", Integer.toString(payloadAsBytes.length));
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+
+        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+        wr.write(payloadAsBytes);
+        wr.flush();
+        wr.close();
+
+        int status = connection.getResponseCode();
+
+        Reader streamReader = null;
+
+        if (status > 299) {
+            throw new LoginException("HTTP response code is above 299 (Bad response)");
+        } else {
+            streamReader = new InputStreamReader(connection.getInputStream());
+        }
+
+        JsonParser parser = new JsonParser();
+
+        JsonObject obj = (JsonObject) parser.parse(streamReader);
+
+        this.accesstoken = obj.get("accessToken").toString();
+        this.authMode = true;
+    }
+
+    /**
+     *
+     * Normal public mojang API.
+     *
+     */
+    public Mojang() {
+        this.accesstoken = null;
+        this.authMode = false;
+    }
 
     /**
      *
@@ -21,8 +88,7 @@ public class Mojang {
      * @param server The server to check its status.
      * @return The state of the server.
      */
-    @NotNull
-    public MojangStates getStatus(@NotNull MojangServerType server) {
+    public MojangStates getStatus(@Nonnull MojangServerType server) {
         try {
             HttpURLConnection connection = getGetConnection("https://status.mojang.com/check");
 
@@ -56,7 +122,7 @@ public class Mojang {
      * Get the user's {@link UUID}
      *
      * @param username The user's name
-     * @return
+     * @return The user's UUID.
      */
 
     @Nullable
@@ -86,6 +152,82 @@ public class Mojang {
         }
     }
 
+    @Nullable
+    public String getName(UUID uuid) {
+
+        try {
+            HttpURLConnection connection = getGetConnection("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names");
+
+            int status = connection.getResponseCode();
+
+            Reader streamReader = null;
+
+            if (status > 299) {
+                return null;
+            } else {
+                streamReader = new InputStreamReader(connection.getInputStream());
+            }
+
+
+
+                JsonParser jsonParser = new JsonParser();
+                JsonArray jsonArray = (JsonArray) jsonParser.parse(streamReader);
+
+                JsonObject object = (JsonObject) jsonArray.get(jsonArray.size() - 1);
+
+            connection.disconnect();
+
+                return object.get("name").toString();
+
+
+
+
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public Name[] getNameHistory(UUID uuid) {
+        try {
+            HttpURLConnection connection = getGetConnection("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names");
+
+            int status = connection.getResponseCode();
+
+            Reader streamReader = null;
+
+            if (status > 299) {
+                return null;
+            } else {
+                streamReader = new InputStreamReader(connection.getInputStream());
+            }
+
+            JsonParser jsonParser = new JsonParser();
+            JsonArray jsonArray = (JsonArray) jsonParser.parse(streamReader);
+
+            Name[] names = new Name[jsonArray.size()];
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject jsonObject = (JsonObject) jsonArray.get(i);
+                long changed;
+                if(jsonObject.get("changedToAt") == null) {
+                    changed = 0;
+                }else{
+                    changed = Long.parseLong(jsonObject.get("changedToAt").toString());
+                }
+                names[i] = new Name(jsonObject.get("name").toString().replaceAll("\"",""),changed);
+            }
+
+
+            connection.disconnect();
+
+            return names;
+        }catch (IOException e){
+            return null;
+        }
+    }
+
+
+
     public UUID getProperUUID(String uuidString){
         if(uuidString.length() != 32){
             return null;
@@ -109,4 +251,16 @@ public class Mojang {
             return connection;
     }
 
+    private HttpURLConnection getPostConnection(String url) throws IOException {
+        URL statusURL = new URL(url);
+
+        HttpURLConnection connection = (HttpURLConnection) statusURL.openConnection();
+        connection.setRequestMethod("POST");
+
+        return connection;
+    }
+
+    public boolean isAuthMode() {
+        return authMode;
+    }
 }
