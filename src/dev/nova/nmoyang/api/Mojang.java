@@ -4,7 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.nova.nmoyang.api.player.Name;
+import dev.nova.nmoyang.api.player.Profile;
+import dev.nova.nmoyang.api.player.Skin;
 import dev.nova.nmoyang.utils.StringUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -150,6 +153,62 @@ public class Mojang {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    @Nullable
+    public Profile getProfile(UUID uuid) {
+
+        try {
+            HttpURLConnection connection = getGetConnection("https://sessionserver.mojang.com/session/minecraft/profile/"+uuid.toString().replace("-",""));
+
+            int status = connection.getResponseCode();
+
+            Reader streamReader = null;
+
+            if (status > 299) {
+                return null;
+            } else {
+                streamReader = new InputStreamReader(connection.getInputStream());
+            }
+
+            JsonParser parser = new JsonParser();
+
+            JsonObject object = (JsonObject) parser.parse(streamReader);
+
+            String id = object.get("id").toString();
+
+            JsonArray array = object.getAsJsonArray("properties");
+
+            JsonObject decoded = (JsonObject) parser.parse(new String(Base64.decodeBase64(array.get(0).getAsJsonObject().get("value").toString())));
+
+            long created = decoded.get("timestamp").getAsLong();
+            JsonObject skin = decoded.getAsJsonObject("textures").getAsJsonObject("SKIN");
+            String urlSkin = skin.get("url").getAsString();
+            boolean slim;
+
+            if(skin.getAsJsonObject("metadata") == null){
+                slim = false;
+            }else{
+                slim = true;
+            }
+
+            String capeurl = null;
+
+            JsonObject cape = decoded.getAsJsonObject("textures").getAsJsonObject("CAPE");
+            if(cape != null) {
+                capeurl = cape.get("url").getAsString();
+            }
+
+
+            if(capeurl == null){
+                return new Profile(id,new Skin(new URL(urlSkin),slim),null);
+            }else{
+                return new Profile(id,new Skin(new URL(urlSkin),slim),new URL(capeurl));
+            }
+        } catch (IOException e) {
+            return null;
+        }
+
     }
 
     @Nullable
