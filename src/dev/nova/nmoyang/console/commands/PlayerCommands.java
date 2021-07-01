@@ -2,6 +2,7 @@ package dev.nova.nmoyang.console.commands;
 
 import dev.nova.nmoyang.Main;
 import dev.nova.nmoyang.api.player.Name;
+import dev.nova.nmoyang.api.player.Profile;
 import dev.nova.nmoyang.console.Command;
 
 import java.text.SimpleDateFormat;
@@ -60,6 +61,44 @@ public class PlayerCommands extends Command {
                                 System.out.println(name.getName()+" is the initial name of: "+Main.getAPI().getName(uuid));
                             }
                         }
+                    }
+                }catch (IllegalArgumentException e) {
+                    UUID uuid;
+                    try {
+                        uuid = Main.getAPI().getUserUUID(args[1]);
+                    }catch (Exception ex) {
+                        System.out.println("Invalid UUID / Username!");
+                        return;
+                    }
+
+                    execute(new String[]{args[0],uuid.toString()});
+                }
+            }
+
+            if(args[0].equalsIgnoreCase("get-profile")){
+                try{
+
+                    UUID uuid = UUID.fromString(args[1]);
+
+                    Profile profile = Main.getAPI().getProfile(uuid);
+
+
+
+                    if(profile != null){
+
+
+                        System.out.println("Profile ID: "+profile.getProfileID());
+                        System.out.println();
+                        System.out.println("Skin URL: "+profile.getSkin().getSkinURL().toString());
+                        System.out.println("Is skin slim: "+profile.getSkin().isSlim());
+                        System.out.println();
+                        if(profile.getCape() != null){
+                            System.out.println("Cape URL: "+profile.getCape().toString());
+                        }else {
+                            System.out.println("This user has no cape!");
+                        }
+                    }else{
+                        System.out.println("Unable to get profile!");
                     }
                 }catch (IllegalArgumentException e) {
                     UUID uuid;
