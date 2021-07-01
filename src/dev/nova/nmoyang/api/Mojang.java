@@ -6,6 +6,8 @@ import com.google.gson.JsonParser;
 import dev.nova.nmoyang.api.player.Name;
 import dev.nova.nmoyang.api.player.Profile;
 import dev.nova.nmoyang.api.player.Skin;
+import dev.nova.nmoyang.api.stats.SaleStatistics;
+import dev.nova.nmoyang.api.stats.SaleStatisticsType;
 import dev.nova.nmoyang.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 
@@ -82,6 +84,54 @@ public class Mojang {
     public Mojang() {
         this.accesstoken = null;
         this.authMode = false;
+    }
+
+    public SaleStatistics getSaleStatistics(SaleStatisticsType type) {
+        try {
+            String payload = "{\n" +
+                    "    \"metricKeys\": [\n" +
+                    "        \""+type.getTypeName()+"\"\n" +
+                    "    ]\n" +
+                    "}";
+
+            URL authenticationURL = new URL("https://api.mojang.com/orders/statistics");
+
+            HttpsURLConnection connection = (HttpsURLConnection) authenticationURL.openConnection();
+            byte payloadAsBytes[] = payload.getBytes(Charset.forName("UTF-8"));
+
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("charset", "UTF-8");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Content-Length", Integer.toString(payloadAsBytes.length));
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+            wr.write(payloadAsBytes);
+            wr.flush();
+            wr.close();
+
+            int status = connection.getResponseCode();
+
+            Reader streamReader = null;
+
+            if (status > 299) {
+                return null;
+            } else {
+                streamReader = new InputStreamReader(connection.getInputStream());
+            }
+
+            JsonParser parser = new JsonParser();
+
+            JsonObject object = (JsonObject) parser.parse(streamReader);
+
+            return new SaleStatistics(type,object.get("last24h").getAsInt(),object.get("total").getAsInt(),object.get("saleVelocityPerSeconds").getAsInt());
+        }catch(IOException E){
+            E.printStackTrace();
+            return null;
+        }
     }
 
     /**
