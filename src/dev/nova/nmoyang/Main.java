@@ -6,7 +6,6 @@ import dev.nova.nmoyang.console.commands.PlayerCommands;
 import dev.nova.nmoyang.console.commands.StatsCommand;
 import dev.nova.nmoyang.console.commands.StatusCommand;
 import dev.nova.nmoyang.console.commands.UpdateNameCommand;
-import dev.nova.nmoyang.gui.GUI;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -18,22 +17,18 @@ public class Main {
     private static Mojang API;
 
     public static void main(String[] args) throws LoginException, IOException {
-        API = new Mojang();
+        API = new Mojang("email","password");
+
+        System.out.println(API.isNameAvailable("Dinnerbone")); //SHOULD RETURN UNAVAILABLE
+        System.out.println(API.isNameAvailable("mynameismama")); //SHOULD RETURN AVAILABLE (Only if it WAS is taken or an error occurred)
 
         registerCommands(new StatusCommand(),new PlayerCommands(),new StatsCommand());
 
-        if(args.length == 0){
-            //guiMode();
-            commandMode("You have entered command mode!");
-        }else if (args.length == 1 && args[0].equalsIgnoreCase("commandMode")){
-            commandMode("You have entered command mode!");
-        }else{
             commandMode("You have entered command mode!");
             if(API.isAuthMode()){
                 System.out.println("The mojang api instance is in authentication mode! Enabling auth-required commands.");
                 registerCommands(new UpdateNameCommand());
             }
-        }
     }
 
     private static void commandMode(String s) {
@@ -76,12 +71,6 @@ public class Main {
         cmdCls.execute(args);
 
         commandMode(null);
-    }
-
-
-
-    private static void guiMode() {
-        GUI gui = new GUI();
     }
 
     public static Mojang getAPI() {
