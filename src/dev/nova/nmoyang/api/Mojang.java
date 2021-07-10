@@ -15,8 +15,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
@@ -334,7 +333,6 @@ public class Mojang {
     }
 
 
-
     public UUID getProperUUID(String uuidString){
         if(uuidString.length() != 32){
             return null;
@@ -347,6 +345,49 @@ public class Mojang {
         String fifth = uuidString.substring(20);
 
         return UUID.fromString(first+"-"+second+"-"+third+"-"+fourth+"-"+fifth);
+    }
+
+    @RequiresAuth
+    public MojangNameState isNameAvailable(String name) {
+
+        try {
+            if(accesstoken != null || name.contains(" ") || name.equalsIgnoreCase("")) {
+
+                HttpURLConnection connection = getGetConnection("https://api.minecraftservices.com/minecraft/profile/name/"+name+"/available");
+
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer "+accesstoken.replaceAll("\"",""));
+
+
+                int status = connection.getResponseCode();
+
+                Reader streamReader = null;
+
+                if (status > 299) {
+                    return MojangNameState.UNKNOWN;
+                } else {
+                    streamReader = new InputStreamReader(connection.getInputStream());
+                }
+
+                JsonParser parser = new JsonParser();
+
+                JsonObject obj = (JsonObject) parser.parse(streamReader);
+
+                connection.disconnect();
+
+                if(obj.get("status").getAsString().equalsIgnoreCase("DUPLICATE")){
+                    return MojangNameState.UNAVAILABLE;
+                }else if(obj.get("status").getAsString().equalsIgnoreCase("AVAILABLE")){
+                    return MojangNameState.AVAILABLE;
+                }else{
+                    return MojangNameState.UNKNOWN;
+                }
+            }else{
+                return MojangNameState.UNKNOWN;
+            }
+        } catch (IOException e) {
+            return MojangNameState.UNKNOWN;
+        }
     }
 
     private HttpURLConnection getGetConnection(String url) throws IOException {
