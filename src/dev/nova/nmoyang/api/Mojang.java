@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
 import javax.net.ssl.HttpsURLConnection;
@@ -83,6 +84,36 @@ public class Mojang {
     public Mojang() {
         this.accesstoken = null;
         this.authMode = false;
+    }
+
+    @Nullable
+    public String[] getBlockedServers() {
+        try {
+            HttpURLConnection connection = getGetConnection("https://sessionserver.mojang.com/blockedservers");
+
+            int status = connection.getResponseCode();
+
+            Reader streamReader = null;
+
+            if (status > 299) {
+                return null;
+            } else {
+                streamReader = new InputStreamReader(connection.getInputStream());
+            }
+
+            BufferedReader reader = new BufferedReader(streamReader);
+
+
+            return reader.lines().toArray(new IntFunction<String[]>() {
+                @Override
+                public String[] apply(int value) {
+                    return new String[value];
+                }
+            });
+
+        }catch (IOException e) {
+            return null;
+        }
     }
 
     public SaleStatistics getSaleStatistics(SaleStatisticsType type) {
