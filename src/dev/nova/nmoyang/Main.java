@@ -20,12 +20,11 @@ public class Main {
         API = new Mojang();
 
         registerCommands(new StatusCommand(),new PlayerCommands(),new StatsCommand());
-
-            commandMode("You have entered command mode!");
             if(API.isAuthMode()){
                 System.out.println("The mojang api instance is in authentication mode! Enabling auth-required commands.");
                 registerCommands(new UpdateNameCommand());
             }
+            commandMode("You have entered command mode!");
     }
 
     private static void commandMode(String s) {
