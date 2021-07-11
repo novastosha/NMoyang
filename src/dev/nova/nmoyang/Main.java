@@ -17,10 +17,7 @@ public class Main {
     private static Mojang API;
 
     public static void main(String[] args) throws LoginException, IOException {
-        API = new Mojang("email","password");
-
-        System.out.println(API.isNameAvailable("Dinnerbone")); //SHOULD RETURN UNAVAILABLE
-        System.out.println(API.isNameAvailable("mynameismama")); //SHOULD RETURN AVAILABLE (Only if it WAS is taken or an error occurred)
+        API = new Mojang();
 
         registerCommands(new StatusCommand(),new PlayerCommands(),new StatsCommand());
 
