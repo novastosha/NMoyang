@@ -12,6 +12,7 @@ import dev.nova.nmoyang.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -24,6 +25,21 @@ import javax.security.auth.login.LoginException;
 
 
 public class Mojang {
+
+    public static boolean featureRequiresAuth(WrapperFeatures feature) {
+        try {
+            Method method = Mojang.class.getMethod(feature.getMethodName(),feature.getClasses());
+
+            if(method.getDeclaredAnnotation(RequiresAuth.class) != null){
+                return method.getDeclaredAnnotation(RequiresAuth.class).required();
+            }else{
+                return false;
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     private final String accesstoken;
     private final boolean authMode;
@@ -207,7 +223,7 @@ public class Mojang {
      * @param server The server to check its status.
      * @return The state of the server.
      */
-    public MojangServiceState getStatus(@Nonnull MojangServiceType server) {
+    public MojangServiceState getServiceStatus(@Nonnull MojangServiceType server) {
         try {
             HttpURLConnection connection = getGetConnection("https://status.mojang.com/check");
 
@@ -400,7 +416,7 @@ public class Mojang {
     }
 
 
-    public UUID getProperUUID(String uuidString){
+    private UUID getProperUUID(String uuidString){
         if(uuidString.length() != 32){
             return null;
         }
