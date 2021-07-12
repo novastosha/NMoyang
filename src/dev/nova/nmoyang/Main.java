@@ -5,7 +5,6 @@ import dev.nova.nmoyang.console.Command;
 import dev.nova.nmoyang.console.commands.PlayerCommands;
 import dev.nova.nmoyang.console.commands.StatsCommand;
 import dev.nova.nmoyang.console.commands.StatusCommand;
-import dev.nova.nmoyang.console.commands.UpdateNameCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -22,7 +21,6 @@ public class Main {
         registerCommands(new StatusCommand(),new PlayerCommands(),new StatsCommand());
             if(API.isAuthMode()){
                 System.out.println("The mojang api instance is in authentication mode! Enabling auth-required commands.");
-                registerCommands(new UpdateNameCommand());
             }
             commandMode("You have entered command mode!");
     }
