@@ -1,6 +1,5 @@
 package dev.nova.nmoyang.bukkit;
 
-import dev.nova.nmoyang.api.Mojang;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
