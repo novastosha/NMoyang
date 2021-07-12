@@ -34,7 +34,7 @@ public class Mojang {
      *
      * @param email Email of the account.
      * @param password Password of the account.
-     * @throws LoginException Gets thrown when it is unable to login.
+     * @throws LoginException Gets thrown when the API is unable to login.
      */
     public Mojang(String email, String password) throws LoginException, IOException {
         String payload = String.format("{\"agent\": {\"name\": \"Minecraft\",\"version\": 1},\"username\": \"" + email + "\",\"password\": \"" + password + "\",\"clientToken\": \"" + UUID.randomUUID() + "\"}");
@@ -84,6 +84,42 @@ public class Mojang {
     public Mojang() {
         this.accesstoken = null;
         this.authMode = false;
+    }
+
+    @RequiresAuth
+    public boolean isNameChangeAllowed() {
+        try {
+            if(authMode) {
+                HttpURLConnection connection = getGetConnection("https://api.minecraftservices.com/minecraft/profile/namechange");
+
+
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Authorization", "Bearer " + accesstoken.replaceAll("\"", ""));
+
+
+                int status = connection.getResponseCode();
+
+                Reader streamReader = null;
+
+                if (status > 299) {
+                    return false;
+                } else {
+                    streamReader = new InputStreamReader(connection.getInputStream());
+                }
+
+                JsonParser parser = new JsonParser();
+
+                JsonObject obj = (JsonObject) parser.parse(streamReader);
+
+                connection.disconnect();
+
+                return obj.get("nameChangeAllowed").getAsBoolean();
+                
+            }else return false;
+
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     @Nullable
