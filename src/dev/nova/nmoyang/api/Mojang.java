@@ -207,7 +207,7 @@ public class Mojang {
      * @param server The server to check its status.
      * @return The state of the server.
      */
-    public MojangStates getStatus(@Nonnull MojangServerType server) {
+    public MojangServiceState getStatus(@Nonnull MojangServiceType server) {
         try {
             HttpURLConnection connection = getGetConnection("https://status.mojang.com/check");
 
@@ -216,14 +216,14 @@ public class Mojang {
             Reader streamReader = null;
 
             if (status > 299) {
-                return MojangStates.UNKNOWN;
+                return MojangServiceState.UNKNOWN;
             } else {
                 streamReader = new InputStreamReader(connection.getInputStream());
             }
 
             BufferedReader reader = new BufferedReader(streamReader);
 
-            MojangStates state = MojangStates.valueOf(StringUtils.substringBetween(StringUtils.substringBetween(reader.readLine(),"[","]").split(",")[server.getIndex()],"{","}").split(":")[1].replaceAll("\"","").toUpperCase(Locale.ROOT));
+            MojangServiceState state = MojangServiceState.valueOf(StringUtils.substringBetween(StringUtils.substringBetween(reader.readLine(),"[","]").split(",")[server.getIndex()],"{","}").split(":")[1].replaceAll("\"","").toUpperCase(Locale.ROOT));
 
 
 
@@ -232,7 +232,7 @@ public class Mojang {
 
             return state;
         } catch (IOException e) {
-            return MojangStates.UNKNOWN;
+            return MojangServiceState.UNKNOWN;
         }
     }
 

@@ -1,6 +1,6 @@
 package dev.nova.nmoyang.api;
 
-public enum MojangServerType {
+public enum MojangServiceType {
 
     MINECRAFT_DOT_NET(0),
     SESSION(1),
@@ -14,7 +14,7 @@ public enum MojangServerType {
 
     private final int index;
 
-    MojangServerType(int i) {
+    MojangServiceType(int i) {
         this.index = i;
     }
 
