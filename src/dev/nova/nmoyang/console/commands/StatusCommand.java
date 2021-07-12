@@ -23,13 +23,13 @@ public class StatusCommand extends Command {
             if(!args[0].equalsIgnoreCase("all")){
                 try{
                     MojangServiceType serverType = MojangServiceType.valueOf(args[0].toUpperCase());
-                    System.out.println(serverType.name()+" is: "+Main.getAPI().getStatus(serverType));
+                    System.out.println(serverType.name()+" is: "+Main.getAPI().getServiceStatus(serverType));
                 }catch (IllegalArgumentException e){
                     System.out.println("Unknown server type!");
                 }
             }else{
                 for(MojangServiceType serverType : MojangServiceType.values()){
-                    System.out.println("- "+serverType.name()+" is: "+Main.getAPI().getStatus(serverType));
+                    System.out.println("- "+serverType.name()+" is: "+Main.getAPI().getServiceStatus(serverType));
                 }
             }
     }
