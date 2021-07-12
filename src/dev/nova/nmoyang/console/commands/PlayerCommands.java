@@ -1,6 +1,6 @@
 package dev.nova.nmoyang.console.commands;
 
-import dev.nova.nmoyang.Main;
+import dev.nova.nmoyang.MainApplication;
 import dev.nova.nmoyang.api.player.Name;
 import dev.nova.nmoyang.api.player.Profile;
 import dev.nova.nmoyang.console.Command;
@@ -27,7 +27,7 @@ public class PlayerCommands extends Command {
         if(args.length == 2){
             if(args[0].equalsIgnoreCase("get-uuid")){
 
-                UUID uuid = Main.getAPI().getUserUUID(args[1]);
+                UUID uuid = MainApplication.getAPI().getUserUUID(args[1]);
 
                 if(uuid != null){
                     System.out.println("The UUID of: "+args[1]+" is: "+uuid);
@@ -40,7 +40,7 @@ public class PlayerCommands extends Command {
 
                     UUID uuid = UUID.fromString(args[1]);
 
-                    System.out.println(Main.getAPI().getName(uuid));
+                    System.out.println(MainApplication.getAPI().getName(uuid));
 
                 }catch (Exception e) {
                     System.out.println("An error occurred!");
@@ -51,21 +51,21 @@ public class PlayerCommands extends Command {
 
                     UUID uuid = UUID.fromString(args[1]);
 
-                    for(Name name : Main.getAPI().getNameHistory(uuid)) {
+                    for(Name name : MainApplication.getAPI().getNameHistory(uuid)) {
                         if(name != null) {
                             java.util.Date time = new java.util.Date(name.getChangedAt());
                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
                             if(name.getChangedAt() != 0) {
                                 System.out.println("Name changed to: " + '"' + name.getName() + '"' + " changed at: " + formatter.format(time));
                             }else{
-                                System.out.println(name.getName()+" is the initial name of: "+Main.getAPI().getName(uuid));
+                                System.out.println(name.getName()+" is the initial name of: "+ MainApplication.getAPI().getName(uuid));
                             }
                         }
                     }
                 }catch (IllegalArgumentException e) {
                     UUID uuid;
                     try {
-                        uuid = Main.getAPI().getUserUUID(args[1]);
+                        uuid = MainApplication.getAPI().getUserUUID(args[1]);
                     }catch (Exception ex) {
                         System.out.println("Invalid UUID / Username!");
                         return;
@@ -80,7 +80,7 @@ public class PlayerCommands extends Command {
 
                     UUID uuid = UUID.fromString(args[1]);
 
-                    Profile profile = Main.getAPI().getProfile(uuid);
+                    Profile profile = MainApplication.getAPI().getProfile(uuid);
 
 
 
@@ -103,7 +103,7 @@ public class PlayerCommands extends Command {
                 }catch (IllegalArgumentException e) {
                     UUID uuid;
                     try {
-                        uuid = Main.getAPI().getUserUUID(args[1]);
+                        uuid = MainApplication.getAPI().getUserUUID(args[1]);
                     }catch (Exception ex) {
                         System.out.println("Invalid UUID / Username!");
                         return;

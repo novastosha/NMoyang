@@ -1,6 +1,6 @@
 package dev.nova.nmoyang.console.commands;
 
-import dev.nova.nmoyang.Main;
+import dev.nova.nmoyang.MainApplication;
 import dev.nova.nmoyang.api.stats.SaleStatistics;
 import dev.nova.nmoyang.api.stats.SaleStatisticsType;
 import dev.nova.nmoyang.console.Command;
@@ -22,7 +22,7 @@ public class StatsCommand extends Command {
 
             SaleStatisticsType type = SaleStatisticsType.valueOf(args[0].toUpperCase());
 
-            SaleStatistics saleStatistics = Main.getAPI().getSaleStatistics(type);
+            SaleStatistics saleStatistics = MainApplication.getAPI().getSaleStatistics(type);
 
             if(saleStatistics != null) {
 

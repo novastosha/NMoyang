@@ -1,6 +1,6 @@
 package dev.nova.nmoyang.console.commands;
 
-import dev.nova.nmoyang.Main;
+import dev.nova.nmoyang.MainApplication;
 import dev.nova.nmoyang.api.MojangServiceType;
 import dev.nova.nmoyang.console.Command;
 
@@ -23,13 +23,13 @@ public class StatusCommand extends Command {
             if(!args[0].equalsIgnoreCase("all")){
                 try{
                     MojangServiceType serverType = MojangServiceType.valueOf(args[0].toUpperCase());
-                    System.out.println(serverType.name()+" is: "+Main.getAPI().getServiceStatus(serverType));
+                    System.out.println(serverType.name()+" is: "+ MainApplication.getAPI().getServiceStatus(serverType));
                 }catch (IllegalArgumentException e){
                     System.out.println("Unknown server type!");
                 }
             }else{
                 for(MojangServiceType serverType : MojangServiceType.values()){
-                    System.out.println("- "+serverType.name()+" is: "+Main.getAPI().getServiceStatus(serverType));
+                    System.out.println("- "+serverType.name()+" is: "+ MainApplication.getAPI().getServiceStatus(serverType));
                 }
             }
     }
